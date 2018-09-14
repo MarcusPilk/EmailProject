@@ -135,6 +135,13 @@ app.get("/sent",(req,res) => {
         });
     }
 });
+app.post("/newemail", (req,res) => {
+    var query = `INSERT INTO email_inbox VALUES (NULL, '${req.cookies.user.email}', '${req.body.recipient}', SYSDATE(), '${req.body.subject}', '${req.body.content}');`
+    con.query(query, (err,result) => {
+        if (err) console.log(err);
+        else res.redirect("/sent");
+    });
+});
 
 
 

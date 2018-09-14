@@ -15,14 +15,15 @@
     </nav>
     <hr>
     <div class="col-sm-2 sidenav">
-        <button class="btn btn-danger">Delete</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#newEmail">Compose</button>
+        <button class="btn btn-danger" onClick="deleteEmails()">Delete</button>
         <hr>
         <h4><a href="/inbox">Inbox</a></h4>
         <hr>
         <h4><a href="/sent">Sent</a></h4>
     </div>
     <div class="col-sm-10 content">
-        <table class="table table-hover">
+        <table id="tBody" class="table table-hover">
         <thead>
         <tr>
             <th>Delete</th>
@@ -33,11 +34,12 @@
         </thead>
         <tbody>
         <% renderObject.emails.forEach(email =>{ %>
-            <tr data-toggle="modal" data-id="<%=email.e_id%>" data-target="#showEmail">
+            <tr data-id="<%=email.e_id%>">
                 <td><input value="<%=email.e_id%>" type="checkbox"></td>
                 <td><%= email.sender%></td>
                 <td><%= email.subject%></td>
                 <td><%= email.date%></td>
+                <td hidden><%=email.content%></td>
             </tr>
                 <%})%>
         </tbody>
@@ -51,10 +53,53 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Modal Header</h4>
+                <h4 class="modal-title" id="modal-title"></h4>
+                <h6 class="modal-title" id="modal-sender"></h6>
+                <h6 class="modal-title" id="modal-date"></h6>
             </div>
-            <div class="modal-body">
-                <p>Some text in the modal.</p>
+            <div class="modal-body" id="showEmailContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade " id="newEmail" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="modal-title">Compose New</h4>
+
+            </div>
+            <div class="modal-body" id="showEmailContent">
+                <form action="/newemail" method="post">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">To:</label>
+                        <input name="recipient" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="emailSubject">Subject</label>
+                        <input name="subject" type="text" class="form-control" id="emailSubject" placeholder="Subject">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="emailBody"></label>
+                        <textarea name="content" class="form-control" id="emailBody" rows="10"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputFile">Add Attachment</label>
+                        <input name="attachment" type="file" class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -67,3 +112,57 @@
 
 
 </html>
+
+<script>
+     function deleteEmails() {
+        $('#tBody').find('input[type="checkbox"]:checked').each(function (id) {
+            //this is the current checkbox
+            console.log(id);
+        });
+    }
+
+    $(function () {
+        $('#showEmail').modal({
+            keyboard: true,
+            backdrop: "static",
+            show: false,
+
+        }).on('show', function () {
+
+        });
+
+        $(".table-hover").find('tr[data-id]').on('click', function () {
+
+            //alert($(this).children().children().closest('td').index())
+
+            if($(this).closest('td').index() == 0){
+
+            }else {
+                debugger;
+
+                //do all your operation populate the modal and open the modal now. DOnt need to use show event of modal again
+                var $row = $(this).closest("tr"),
+                    $tds = $row.find("td:nth-child(5)");
+                $('#showEmailContent').html($('<b> ' + $tds.text() + '</b>'));
+
+                var $row = $(this).closest("tr"),
+                    $tds = $row.find("td:nth-child(3)");
+                $('#modal-title').html($('<b> ' + $tds.text() + '</b>'));
+
+                var $row = $(this).closest("tr"),
+                    $tds = $row.find("td:nth-child(2)");
+                $('#modal-sender').html($('<b> ' + $tds.text() + '</b>'));
+
+                var $row = $(this).closest("tr"),
+                    $tds = $row.find("td:nth-child(4)");
+                $('#modal-date').html($('<b> ' + $tds.text() + '</b>'));
+
+                $('#showEmail').modal('show');
+            }
+
+
+        });
+
+    });
+</script>
+
